@@ -10,7 +10,7 @@ export class OrdersService {
 
 	async create(createOrderInput: CreateOrderInput) {
 		// Sử dụng transaction để đảm bảo tất cả operations thành công
-		return this.prisma.$transaction(async (tx) => {
+		return await this.prisma.$transaction(async (tx) => {
 			// Tạo order trước
 			const order = await tx.order.create({
 				data: {
@@ -57,7 +57,7 @@ export class OrdersService {
 	}
 
 	async findAll() {
-		return this.prisma.order.findMany({
+		return await this.prisma.order.findMany({
 			include: {
 				items: {
 					include: {
@@ -77,7 +77,7 @@ export class OrdersService {
 	}
 
 	async findOne(id: number) {
-		return this.prisma.order.findUnique({
+		return await this.prisma.order.findUnique({
 			where: { id },
 			include: {
 				items: {
@@ -97,7 +97,7 @@ export class OrdersService {
 	async update(id: number, updateOrderInput: UpdateOrderInput) {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { id: _, items, userId, ...updateData } = updateOrderInput;
-		return this.prisma.order.update({
+		return await this.prisma.order.update({
 			where: { id },
 			data: updateData,
 			include: {
@@ -112,7 +112,7 @@ export class OrdersService {
 	}
 
 	async remove(id: number) {
-		return this.prisma.order.delete({
+		return await this.prisma.order.delete({
 			where: { id },
 			include: {
 				items: true,
@@ -122,7 +122,7 @@ export class OrdersService {
 	}
 
 	async findByUser(userId: number) {
-		return this.prisma.order.findMany({
+		return await this.prisma.order.findMany({
 			where: { userId },
 			include: {
 				items: {
@@ -142,7 +142,7 @@ export class OrdersService {
 	}
 
 	async findByStatus(status: OrderStatus) {
-		return this.prisma.order.findMany({
+		return await this.prisma.order.findMany({
 			where: { status },
 			include: {
 				items: {
@@ -163,7 +163,7 @@ export class OrdersService {
 	}
 
 	async updateStatus(id: number, status: OrderStatus) {
-		return this.prisma.order.update({
+		return await this.prisma.order.update({
 			where: { id },
 			data: { status },
 			include: {
