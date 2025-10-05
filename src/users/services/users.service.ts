@@ -12,7 +12,7 @@ export class UsersService {
 		// Hash password using argon2
 		const hashedPassword = await argon2.hash(createUserInput.password || '');
 
-		return this.prisma.user.create({
+		return await this.prisma.user.create({
 			data: {
 				email: createUserInput.email,
 				name: createUserInput.name,
@@ -24,7 +24,7 @@ export class UsersService {
 	}
 
 	async findAll() {
-		return this.prisma.user.findMany({
+		return await this.prisma.user.findMany({
 			include: {
 				restaurants: true,
 				orders: {
@@ -37,7 +37,7 @@ export class UsersService {
 	}
 
 	async findOne(id: number) {
-		return this.prisma.user.findUnique({
+		return await this.prisma.user.findUnique({
 			where: { id },
 			include: {
 				restaurants: true,
@@ -59,32 +59,32 @@ export class UsersService {
 			updateData.password = await argon2.hash(updateData.password);
 		}
 
-		return this.prisma.user.update({
+		return await this.prisma.user.update({
 			where: { id },
 			data: updateData,
 		});
 	}
 
 	async remove(id: number) {
-		return this.prisma.user.delete({
+		return await this.prisma.user.delete({
 			where: { id },
 		});
 	}
 
 	async findByEmail(email: string) {
-		return this.prisma.user.findUnique({
+		return await this.prisma.user.findUnique({
 			where: { email },
 		});
 	}
 
 	async findRestaurantsByOwner(ownerId: number) {
-		return this.prisma.restaurant.findMany({
+		return await this.prisma.restaurant.findMany({
 			where: { ownerId },
 		});
 	}
 
 	async findOrdersByUser(userId: number) {
-		return this.prisma.order.findMany({
+		return await this.prisma.order.findMany({
 			where: { userId },
 			include: {
 				items: {
