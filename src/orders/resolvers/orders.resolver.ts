@@ -25,54 +25,59 @@ export class OrdersResolver {
 	@Mutation(() => Order)
 	async createOrder(
 		@Args('createOrderInput') createOrderInput: CreateOrderInput,
-	) {
-		return this.ordersService.create(createOrderInput);
+	): Promise<any> {
+		return await this.ordersService.create(createOrderInput);
 	}
 
 	@Query(() => [Order], { name: 'orders' })
-	async findAll() {
-		return this.ordersService.findAll();
+	async findAll(): Promise<any[]> {
+		return await this.ordersService.findAll();
 	}
 
 	@Query(() => Order, { name: 'order' })
-	async findOne(@Args('id', { type: () => Int }) id: number) {
-		return this.ordersService.findOne(id);
+	async findOne(@Args('id', { type: () => Int }) id: number): Promise<any> {
+		return await this.ordersService.findOne(id);
 	}
 
 	@Query(() => [Order], { name: 'ordersByUser' })
-	async findByUser(@Args('userId', { type: () => Int }) userId: number) {
-		return this.ordersService.findByUser(userId);
+	async findByUser(
+		@Args('userId', { type: () => Int }) userId: number,
+	): Promise<any[]> {
+		return await this.ordersService.findByUser(userId);
 	}
 
 	@Query(() => [Order], { name: 'ordersByStatus' })
 	async findByStatus(
 		@Args('status', { type: () => OrderStatus }) status: OrderStatus,
-	) {
-		return this.ordersService.findByStatus(status);
+	): Promise<any[]> {
+		return await this.ordersService.findByStatus(status);
 	}
 
 	@Mutation(() => Order)
 	async updateOrder(
 		@Args('updateOrderInput') updateOrderInput: UpdateOrderInput,
-	) {
-		return this.ordersService.update(updateOrderInput.id, updateOrderInput);
+	): Promise<any> {
+		return await this.ordersService.update(
+			updateOrderInput.id,
+			updateOrderInput,
+		);
 	}
 
 	@Mutation(() => Order)
 	async updateOrderStatus(
 		@Args('id', { type: () => Int }) id: number,
 		@Args('status', { type: () => OrderStatus }) status: OrderStatus,
-	) {
-		return this.ordersService.updateStatus(id, status);
+	): Promise<any> {
+		return await this.ordersService.updateStatus(id, status);
 	}
 
 	@Mutation(() => Order)
-	async removeOrder(@Args('id', { type: () => Int }) id: number) {
-		return this.ordersService.remove(id);
+	async removeOrder(@Args('id', { type: () => Int }) id: number): Promise<any> {
+		return await this.ordersService.remove(id);
 	}
 
 	@ResolveField('user', () => User)
-	getUser(@Parent() order: Order) {
+	getUser(@Parent() order: Order): Promise<any> {
 		return this.usersService.findOne(order.userId);
 	}
 }
