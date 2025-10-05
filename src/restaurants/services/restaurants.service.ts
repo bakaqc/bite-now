@@ -11,13 +11,13 @@ export class RestaurantsService {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async create(createRestaurantInput: CreateRestaurantInput) {
-		return this.prisma.restaurant.create({
+		return await this.prisma.restaurant.create({
 			data: createRestaurantInput,
 		});
 	}
 
 	async findAll() {
-		return this.prisma.restaurant.findMany({
+		return await this.prisma.restaurant.findMany({
 			include: {
 				owner: true,
 			},
@@ -25,7 +25,7 @@ export class RestaurantsService {
 	}
 
 	async findOne(id: number) {
-		return this.prisma.restaurant.findUnique({
+		return await this.prisma.restaurant.findUnique({
 			where: { id },
 			include: {
 				owner: true,
@@ -36,14 +36,14 @@ export class RestaurantsService {
 	async update(id: number, updateRestaurantInput: UpdateRestaurantInput) {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { id: _, ...updateData } = updateRestaurantInput;
-		return this.prisma.restaurant.update({
+		return await this.prisma.restaurant.update({
 			where: { id },
 			data: updateData,
 		});
 	}
 
 	async remove(id: number) {
-		return this.prisma.restaurant.delete({
+		return await this.prisma.restaurant.delete({
 			where: { id },
 		});
 	}
