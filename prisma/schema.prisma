@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  CUSTOMER
+  RESTAURANT_OWNER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COOKING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  name        String
+  password    String? // lưu hashed password
+  role        Role         @default(CUSTOMER)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  restaurants Restaurant[] // nếu user là owner -> các nhà hàng
+  orders      Order[]
+
+  @@map("users")
+}
+
+model Restaurant {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  address     String
+  phone       String?
+  isActive    Boolean    @default(true)
+  owner       User?      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     Int?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  menuItems   MenuItem[]
+
+  @@index([ownerId])
+  @@map("restaurants")
+}
+
+model MenuItem {
+  id           Int         @id @default(autoincrement())
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId Int
+  name         String
+  description  String?
+  price        Decimal     @db.Decimal(10, 2) // Lưu giá dùng Decimal để tránh sai số
+  isAvailable  Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  OrderItem    OrderItem[]
+
+  // đảm bảo 1 nhà hàng không có 2 món trùng tên
+  @@unique([restaurantId, name])
+  @@index([restaurantId])
+  @@map("menu_items")
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int
+  items           OrderItem[]
+  totalPrice      Decimal     @db.Decimal(10, 2)
+  status          OrderStatus @default(PENDING)
+  deliveryAddress String?
+  paymentMethod   String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId    Int
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: NoAction)
+  menuItemId Int
+  quantity   Int      @default(1)
+  unitPrice  Decimal  @db.Decimal(10, 2) // giá lúc đặt hàng (không phụ thuộc giá menu hiện tại)
+  totalPrice Decimal  @db.Decimal(10, 2) // unitPrice * quantity (lưu để đơn giản hóa reporting)
+  createdAt  DateTime @default(now())
+
+  @@index([orderId])
+  @@map("order_items")
+}
