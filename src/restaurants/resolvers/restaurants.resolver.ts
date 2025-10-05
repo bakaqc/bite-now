@@ -30,43 +30,45 @@ export class RestaurantsResolver {
 	@Mutation(() => Restaurant)
 	async createRestaurant(
 		@Args('createRestaurantInput') createRestaurantInput: CreateRestaurantInput,
-	) {
-		return this.restaurantsService.create(createRestaurantInput);
+	): Promise<any> {
+		return await this.restaurantsService.create(createRestaurantInput);
 	}
 
 	@Query(() => [Restaurant], { name: 'restaurants' })
-	async findAll() {
-		return this.restaurantsService.findAll();
+	async findAll(): Promise<any[]> {
+		return await this.restaurantsService.findAll();
 	}
 
 	@Query(() => Restaurant, { name: 'restaurant' })
-	async findOne(@Args('id', { type: () => Int }) id: number) {
-		return this.restaurantsService.findOne(id);
+	async findOne(@Args('id', { type: () => Int }) id: number): Promise<any> {
+		return await this.restaurantsService.findOne(id);
 	}
 
 	@Mutation(() => Restaurant)
 	async updateRestaurant(
 		@Args('updateRestaurantInput') updateRestaurantInput: UpdateRestaurantInput,
-	) {
-		return this.restaurantsService.update(
+	): Promise<any> {
+		return await this.restaurantsService.update(
 			updateRestaurantInput.id,
 			updateRestaurantInput,
 		);
 	}
 
 	@Mutation(() => Restaurant)
-	async removeRestaurant(@Args('id', { type: () => Int }) id: number) {
-		return this.restaurantsService.remove(id);
+	async removeRestaurant(
+		@Args('id', { type: () => Int }) id: number,
+	): Promise<any> {
+		return await this.restaurantsService.remove(id);
 	}
 
 	@ResolveField('owner', () => User, { nullable: true })
-	getOwner(@Parent() restaurant: Restaurant) {
+	getOwner(@Parent() restaurant: Restaurant): Promise<any> | null {
 		if (!restaurant.ownerId) return null;
 		return this.usersService.findOne(restaurant.ownerId);
 	}
 
 	@ResolveField('menuItems', () => [MenuItem])
-	getMenuItems(@Parent() restaurant: Restaurant) {
+	getMenuItems(@Parent() restaurant: Restaurant): Promise<any[]> {
 		return this.menuItemsService.findByRestaurant(restaurant.id);
 	}
 }
