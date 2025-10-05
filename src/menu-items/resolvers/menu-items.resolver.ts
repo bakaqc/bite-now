@@ -24,44 +24,46 @@ export class MenuItemsResolver {
 	@Mutation(() => MenuItem)
 	async createMenuItem(
 		@Args('createMenuItemInput') createMenuItemInput: CreateMenuItemInput,
-	) {
-		return this.menuItemsService.create(createMenuItemInput);
+	): Promise<any> {
+		return await this.menuItemsService.create(createMenuItemInput);
 	}
 
 	@Query(() => [MenuItem], { name: 'menuItems' })
-	async findAll() {
-		return this.menuItemsService.findAll();
+	async findAll(): Promise<any[]> {
+		return await this.menuItemsService.findAll();
 	}
 
 	@Query(() => MenuItem, { name: 'menuItem' })
-	async findOne(@Args('id', { type: () => Int }) id: number) {
-		return this.menuItemsService.findOne(id);
+	async findOne(@Args('id', { type: () => Int }) id: number): Promise<any> {
+		return await this.menuItemsService.findOne(id);
 	}
 
 	@Query(() => [MenuItem], { name: 'menuItemsByRestaurant' })
 	async findByRestaurant(
 		@Args('restaurantId', { type: () => Int }) restaurantId: number,
-	) {
-		return this.menuItemsService.findByRestaurant(restaurantId);
+	): Promise<any[]> {
+		return await this.menuItemsService.findByRestaurant(restaurantId);
 	}
 
 	@Mutation(() => MenuItem)
 	async updateMenuItem(
 		@Args('updateMenuItemInput') updateMenuItemInput: UpdateMenuItemInput,
-	) {
-		return this.menuItemsService.update(
+	): Promise<any> {
+		return await this.menuItemsService.update(
 			updateMenuItemInput.id,
 			updateMenuItemInput,
 		);
 	}
 
 	@Mutation(() => MenuItem)
-	async removeMenuItem(@Args('id', { type: () => Int }) id: number) {
-		return this.menuItemsService.remove(id);
+	async removeMenuItem(
+		@Args('id', { type: () => Int }) id: number,
+	): Promise<any> {
+		return await this.menuItemsService.remove(id);
 	}
 
 	@ResolveField('restaurant', () => Restaurant)
-	getRestaurant(@Parent() menuItem: MenuItem) {
+	getRestaurant(@Parent() menuItem: MenuItem): Promise<any> {
 		return this.restaurantsService.findOne(menuItem.restaurantId);
 	}
 }
