@@ -8,7 +8,7 @@ export class MenuItemsService {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async create(createMenuItemInput: CreateMenuItemInput) {
-		return this.prisma.menuItem.create({
+		return await this.prisma.menuItem.create({
 			data: {
 				name: createMenuItemInput.name,
 				description: createMenuItemInput.description,
@@ -20,7 +20,7 @@ export class MenuItemsService {
 	}
 
 	async findAll() {
-		return this.prisma.menuItem.findMany({
+		return await this.prisma.menuItem.findMany({
 			include: {
 				restaurant: true,
 			},
@@ -28,7 +28,7 @@ export class MenuItemsService {
 	}
 
 	async findOne(id: number) {
-		return this.prisma.menuItem.findUnique({
+		return await this.prisma.menuItem.findUnique({
 			where: { id },
 			include: {
 				restaurant: true,
@@ -39,20 +39,20 @@ export class MenuItemsService {
 	async update(id: number, updateMenuItemInput: UpdateMenuItemInput) {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { id: _, ...updateData } = updateMenuItemInput;
-		return this.prisma.menuItem.update({
+		return await this.prisma.menuItem.update({
 			where: { id },
 			data: updateData,
 		});
 	}
 
 	async remove(id: number) {
-		return this.prisma.menuItem.delete({
+		return await this.prisma.menuItem.delete({
 			where: { id },
 		});
 	}
 
 	async findByRestaurant(restaurantId: number) {
-		return this.prisma.menuItem.findMany({
+		return await this.prisma.menuItem.findMany({
 			where: { restaurantId },
 		});
 	}
