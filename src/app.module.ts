@@ -2,6 +2,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 
+import { AuthModule } from '@/auth/auth.module';
 import { MenuItemsModule } from '@/menu-items/menu-items.module';
 import { OrdersModule } from '@/orders/orders.module';
 import { PrismaModule } from '@/providers/prisma/prisma.module';
@@ -16,6 +17,7 @@ import { UsersModule } from '@/users/users.module';
 			playground: true, // Bật GraphQL Playground
 			introspection: true, // Cho phép introspection
 		}),
+		AuthModule,
 		UsersModule,
 		RestaurantsModule,
 		MenuItemsModule,
