@@ -45,6 +45,7 @@ model Restaurant {
   description String?
   address     String
   phone       String?
+  imageUrl    String? // URL của ảnh nhà hàng
   isActive    Boolean    @default(true)
   owner       User?      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId     Int?
@@ -63,6 +64,7 @@ model MenuItem {
   name         String
   description  String?
   price        Decimal     @db.Decimal(10, 2) // Lưu giá dùng Decimal để tránh sai số
+  imageUrl     String? // URL của ảnh món ăn
   isAvailable  Boolean     @default(true)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
