@@ -19,6 +19,9 @@ export class MenuItem {
 	@Field(() => Float)
 	price: number;
 
+	@Field(() => String, { nullable: true })
+	imageUrl?: string;
+
 	@Field(() => Boolean)
 	isAvailable: boolean;
 
