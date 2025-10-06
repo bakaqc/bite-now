@@ -28,8 +28,8 @@ export class User {
 	updatedAt: Date;
 
 	@Field(() => [Restaurant])
-	restaurants: Restaurant[];
+	restaurants?: Restaurant[];
 
 	@Field(() => [Order])
-	orders: Order[];
+	orders?: Order[];
 }
