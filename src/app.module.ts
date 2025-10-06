@@ -7,6 +7,7 @@ import { MenuItemsModule } from '@/menu-items/menu-items.module';
 import { OrdersModule } from '@/orders/orders.module';
 import { PrismaModule } from '@/providers/prisma/prisma.module';
 import { RestaurantsModule } from '@/restaurants/restaurants.module';
+import { UploadModule } from '@/upload/upload.module';
 import { UsersModule } from '@/users/users.module';
 
 @Module({
@@ -18,6 +19,7 @@ import { UsersModule } from '@/users/users.module';
 			introspection: true, // Cho phép introspection
 		}),
 		AuthModule,
+		UploadModule,
 		UsersModule,
 		RestaurantsModule,
 		MenuItemsModule,
