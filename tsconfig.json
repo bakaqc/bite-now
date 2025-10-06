@@ -13,11 +13,13 @@
 		"paths": {
 			"~/*": ["./*"],
 			"@/*": ["src/*"],
+			"@/auth/*": ["src/auth/*"],
 			"@/menu-items/*": ["src/menu-items/*"],
 			"@/orders/*": ["src/orders/*"],
 			"@/providers/*": ["src/providers/*"],
 			"@/restaurants/*": ["src/restaurants/*"],
-			"@/users/*": ["src/users/*"]
+			"@/upload/*": ["src/upload/*"],
+			"@/users/*": ["src/users/*"],
 		},
     "incremental": true,
     "skipLibCheck": true,

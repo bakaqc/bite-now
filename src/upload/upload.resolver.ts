@@ -1,7 +1,8 @@
-import { JwtAuthGuard, Roles } from '../auth';
-import { Role } from '../users/enums/role.enum';
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
+
+import { JwtAuthGuard, Roles } from '@/auth';
+import { Role } from '@/users/enums/role.enum';
 
 import { UploadService, UploadedFile } from './upload.service';
 
