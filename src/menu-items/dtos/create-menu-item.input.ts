@@ -14,6 +14,9 @@ export class CreateMenuItemInput {
 	@Field(() => Float)
 	price: number;
 
+	@Field(() => String, { nullable: true })
+	imageUrl?: string;
+
 	@Field(() => Boolean, { nullable: true, defaultValue: true })
 	isAvailable?: boolean;
 }
