@@ -1,5 +1,7 @@
+import { UseGuards } from '@nestjs/common';
 import {
 	Args,
+	Context,
 	Int,
 	Mutation,
 	Parent,
@@ -8,6 +10,7 @@ import {
 	Resolver,
 } from '@nestjs/graphql';
 
+import { JwtAuthGuard, Roles, RolesGuard } from '@/auth';
 import { MenuItem } from '@/menu-items/entities';
 import { MenuItemsService } from '@/menu-items/services/menu-items.service';
 import {
@@ -17,6 +20,7 @@ import {
 import { Restaurant } from '@/restaurants/entities';
 import { RestaurantsService } from '@/restaurants/services/restaurants.service';
 import { User } from '@/users/entities';
+import { Role } from '@/users/enums/role.enum';
 import { UsersService } from '@/users/services/users.service';
 
 @Resolver(() => Restaurant)
@@ -28,10 +32,34 @@ export class RestaurantsResolver {
 	) {}
 
 	@Mutation(() => Restaurant)
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(Role.RESTAURANT_OWNER, Role.ADMIN)
 	async createRestaurant(
 		@Args('createRestaurantInput') createRestaurantInput: CreateRestaurantInput,
-	): Promise<any> {
-		return await this.restaurantsService.create(createRestaurantInput);
+		@Context() context: { req: { user: User } },
+	): Promise<Restaurant> {
+		// Automatically set ownerId to current user if not provided
+		const currentUser: User = context.req.user;
+		if (!createRestaurantInput.ownerId) {
+			createRestaurantInput.ownerId = currentUser.id;
+		}
+		const restaurant = await this.restaurantsService.create(
+			createRestaurantInput,
+		);
+		return {
+			...restaurant,
+			description: restaurant.description ?? undefined,
+			phone: restaurant.phone ?? undefined,
+			imageUrl: restaurant.imageUrl ?? undefined,
+			ownerId: restaurant.ownerId ?? undefined,
+			isActive: restaurant.isActive,
+			createdAt: restaurant.createdAt,
+			updatedAt: restaurant.updatedAt,
+			id: restaurant.id,
+			name: restaurant.name,
+			address: restaurant.address,
+			menuItems: [],
+		};
 	}
 
 	@Query(() => [Restaurant], { name: 'restaurants' })
@@ -45,6 +73,8 @@ export class RestaurantsResolver {
 	}
 
 	@Mutation(() => Restaurant)
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(Role.RESTAURANT_OWNER, Role.ADMIN)
 	async updateRestaurant(
 		@Args('updateRestaurantInput') updateRestaurantInput: UpdateRestaurantInput,
 	): Promise<any> {
@@ -55,6 +85,8 @@ export class RestaurantsResolver {
 	}
 
 	@Mutation(() => Restaurant)
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(Role.RESTAURANT_OWNER, Role.ADMIN)
 	async removeRestaurant(
 		@Args('id', { type: () => Int }) id: number,
 	): Promise<any> {

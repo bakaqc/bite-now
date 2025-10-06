@@ -14,6 +14,9 @@ export class CreateRestaurantInput {
 	@Field(() => String, { nullable: true })
 	phone?: string;
 
+	@Field(() => String, { nullable: true })
+	imageUrl?: string;
+
 	@Field(() => Int, { nullable: true })
 	ownerId?: number;
 

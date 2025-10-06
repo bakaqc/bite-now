@@ -20,6 +20,9 @@ export class Restaurant {
 	@Field(() => String, { nullable: true })
 	phone?: string;
 
+	@Field(() => String, { nullable: true })
+	imageUrl?: string;
+
 	@Field(() => Boolean)
 	isActive: boolean;
 
