@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
-export interface UploadedFile {
+export interface FileUpload {
 	filename: string;
 	mimetype: string;
 	encoding: string;
@@ -21,7 +21,7 @@ export class UploadService {
 	}
 
 	async uploadFile(
-		upload: Promise<UploadedFile>,
+		upload: Promise<FileUpload>,
 		subfolder = '',
 	): Promise<string> {
 		const { createReadStream, filename, mimetype } = await upload;
@@ -66,11 +66,11 @@ export class UploadService {
 		});
 	}
 
-	async uploadRestaurantImage(upload: Promise<UploadedFile>): Promise<string> {
+	async uploadRestaurantImage(upload: Promise<FileUpload>): Promise<string> {
 		return this.uploadFile(upload, 'restaurants');
 	}
 
-	async uploadMenuItemImage(upload: Promise<UploadedFile>): Promise<string> {
+	async uploadMenuItemImage(upload: Promise<FileUpload>): Promise<string> {
 		return this.uploadFile(upload, 'menu-items');
 	}
 }
