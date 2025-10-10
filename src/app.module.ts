@@ -1,6 +1,7 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
+import { Request, Response } from 'express';
 
 import { AuthModule } from '@/auth/auth.module';
 import { MenuItemsModule } from '@/menu-items/menu-items.module';
@@ -17,6 +18,10 @@ import { UsersModule } from '@/users/users.module';
 			autoSchemaFile: true, // Tự động tạo schema từ decorators
 			playground: true, // Bật GraphQL Playground
 			introspection: true, // Cho phép introspection
+			context: ({ req, res }: { req: Request; res: Response }) => ({
+				req,
+				res,
+			}),
 		}),
 		AuthModule,
 		UploadModule,
