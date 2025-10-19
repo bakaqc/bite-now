@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { createWriteStream, existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+
+import { CloudinaryService } from './cloudinary.service';
 
 export interface FileUpload {
 	filename: string;
@@ -9,68 +9,88 @@ export interface FileUpload {
 	createReadStream: () => NodeJS.ReadableStream;
 }
 
+export interface UploadResult {
+	filename: string;
+	url: string;
+	size: number;
+	mimetype: string;
+	publicId: string;
+}
+
 @Injectable()
 export class UploadService {
-	private readonly uploadPath = join(process.cwd(), 'uploads');
-
-	constructor() {
-		// Tạo thư mục uploads nếu chưa tồn tại
-		if (!existsSync(this.uploadPath)) {
-			mkdirSync(this.uploadPath, { recursive: true });
-		}
-	}
+	constructor(private cloudinaryService: CloudinaryService) {}
 
 	async uploadFile(
-		upload: Promise<FileUpload>,
-		subfolder = '',
-	): Promise<string> {
-		const { createReadStream, filename, mimetype } = await upload;
-
+		file: Express.Multer.File,
+		folder: string,
+	): Promise<UploadResult> {
 		// Validate file type (chỉ cho phép ảnh)
-		if (!mimetype.startsWith('image/')) {
+		if (!file.mimetype.startsWith('image/')) {
 			throw new Error('Only image files are allowed');
 		}
 
-		// Tạo tên file unique
-		const timestamp = Date.now();
-		const uniqueFilename = `${timestamp}-${filename}`;
+		// Upload to Cloudinary
+		const result = await this.cloudinaryService.uploadImage(file, folder);
 
-		// Tạo đường dẫn đầy đủ
-		const targetPath = subfolder
-			? join(this.uploadPath, subfolder)
-			: this.uploadPath;
+		return {
+			filename: result.original_filename,
+			url: result.secure_url,
+			size: result.bytes,
+			mimetype: file.mimetype,
+			publicId: result.public_id,
+		};
+	}
 
-		// Tạo thư mục con nếu cần
-		if (!existsSync(targetPath)) {
-			mkdirSync(targetPath, { recursive: true });
+	async uploadMultipleFiles(
+		files: Express.Multer.File[],
+		folder: string,
+	): Promise<UploadResult[]> {
+		// Validate all files are images
+		for (const file of files) {
+			if (!file.mimetype.startsWith('image/')) {
+				throw new Error(`File ${file.originalname} is not an image`);
+			}
 		}
 
-		const fullPath = join(targetPath, uniqueFilename);
+		// Upload all files to Cloudinary
+		const results = await this.cloudinaryService.uploadMultipleImages(
+			files,
+			folder,
+		);
 
-		// Lưu file
-		return new Promise((resolve, reject) => {
-			const stream = createReadStream();
-			const writeStream = createWriteStream(fullPath);
-
-			stream.pipe(writeStream);
-
-			writeStream.on('finish', () => {
-				// Trả về URL tương đối để lưu vào database
-				const relativeUrl = subfolder
-					? `/uploads/${subfolder}/${uniqueFilename}`
-					: `/uploads/${uniqueFilename}`;
-				resolve(relativeUrl);
-			});
-
-			writeStream.on('error', reject);
-		});
+		return results.map((result, index) => ({
+			filename: result.original_filename,
+			url: result.secure_url,
+			size: result.bytes,
+			mimetype: files[index].mimetype,
+			publicId: result.public_id,
+		}));
 	}
 
-	async uploadRestaurantImage(upload: Promise<FileUpload>): Promise<string> {
-		return this.uploadFile(upload, 'restaurants');
+	async uploadRestaurantImage(
+		file: Express.Multer.File,
+	): Promise<UploadResult> {
+		return this.uploadFile(file, 'restaurants');
 	}
 
-	async uploadMenuItemImage(upload: Promise<FileUpload>): Promise<string> {
-		return this.uploadFile(upload, 'menu-items');
+	async uploadMenuItemImage(file: Express.Multer.File): Promise<UploadResult> {
+		return this.uploadFile(file, 'menu-items');
+	}
+
+	async uploadMultipleRestaurantImages(
+		files: Express.Multer.File[],
+	): Promise<UploadResult[]> {
+		return this.uploadMultipleFiles(files, 'restaurants');
+	}
+
+	async uploadMultipleMenuItemImages(
+		files: Express.Multer.File[],
+	): Promise<UploadResult[]> {
+		return this.uploadMultipleFiles(files, 'menu-items');
+	}
+
+	async deleteImage(publicId: string): Promise<any> {
+		return this.cloudinaryService.deleteImage(publicId);
 	}
 }
